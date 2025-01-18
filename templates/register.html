@@ -97,7 +97,11 @@
         border: 3px solid #000;
         box-shadow: 5px 5px 0 #000;
       }
-
+      .warning {
+        color: red;
+        font-size: 0.9rem;
+        display: none; /* Sembunyikan pesan peringatan secara default */
+      }
       .circle {
         width: 50px;
         height: 50px;
@@ -142,16 +146,14 @@
     </style>
   </head>
   <body>
-    <!-- Menampilkan pesan flash -->
-
-    <form method="POST">
-      <!-- Menampilkan pesan flash -->
+    <form method="POST" id="registrationForm">
       {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %}
       <div class="flash-message {{ messages[0][0] }}">{{ messages[0][1] }}</div>
       {% endif %} {% endwith %}
       <h1>Register</h1>
       <label for="username">Username</label>
       <input type="text" id="username" name="username" required />
+      <span id="warning" class="warning">Username cannot be more than 8 characters!</span>
       <label for="password">Password</label>
       <input type="password" id="password" name="password" required />
       <button type="submit">Register</button>
@@ -163,5 +165,25 @@
       <div class="decorative-shape circle"></div>
       <div class="decorative-shape triangle"></div>
     </form>
+    <script>
+      const usernameInput = document.getElementById('username');
+      const warningMessage = document.getElementById('warning');
+      const form = document.getElementById('registrationForm');
+
+      usernameInput.addEventListener('input', function () {
+        if (usernameInput.value.length > 8) {
+          warningMessage.style.display = 'inline';
+        } else {
+          warningMessage.style.display = 'none';
+        }
+      });
+
+      form.addEventListener('submit', function (event) {
+        if (usernameInput.value.length > 8) {
+          event.preventDefault();
+          alert('Username cannot be more than 8 characters!');
+        }
+      });
+    </script>
   </body>
 </html>

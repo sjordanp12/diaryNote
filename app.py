@@ -1,8 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_pymongo import PyMongo
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
 import os
+from datetime import datetime
+
+
 app = Flask(__name__)
 
 load_dotenv()
@@ -12,6 +15,7 @@ app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 app.secret_key = 'supersecretkey'  # Ganti dengan key yang lebih aman
 
 mongo = PyMongo(app)
+bcrypt = Bcrypt(app)  # Inisialisasi Flask-Bcrypt
 
 # Halaman utama - menampilkan catatan pengguna
 @app.route('/')
@@ -33,7 +37,8 @@ def login():
         # Cek apakah user ada di database
         user = mongo.db.users.find_one({"username": username})
 
-        if user and check_password_hash(user['password'], password):
+        # Menggunakan bcrypt untuk memeriksa hash password
+        if user and bcrypt.check_password_hash(user['password'], password):
             session['username'] = username
             return redirect(url_for('home'))
         else:
@@ -52,15 +57,18 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        hashed_password = generate_password_hash(password)
+
+        # Hash password menggunakan bcrypt
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
         existing_user = mongo.db.users.find_one({"username": username})
 
         if existing_user:
             flash("Username already exists!")
         else:
+            # Simpan user dengan password yang telah di-hash
             mongo.db.users.insert_one({"username": username, "password": hashed_password})
-            flash("Registration successful! You can log in now .")
+            flash("Registration successful! You can log in now.")
             return redirect(url_for('login'))
 
     return render_template('register.html')
@@ -71,13 +79,17 @@ def add_note():
     if 'username' not in session:
         return redirect(url_for('login'))
 
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
     if request.method == 'POST':
         title = request.form['title']
         content = request.form['content']
         mongo.db.notes.insert_one({
             "username": session['username'],
             "title": title,
-            "content": content
+            "content": content,
+            "created_at": current_time
         })
         return redirect(url_for('home'))
 

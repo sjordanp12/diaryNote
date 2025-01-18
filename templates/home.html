@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet" />
+    <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/x-icon" />
     <style>
       body {
         font-family: 'Space Grotesk', serif;
@@ -28,14 +29,61 @@
         font-weight: 700;
         text-align: center;
         margin-bottom: 2rem;
+        background-color: #ffcc00;
+      }
+
+      #text {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #000;
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .hidden {
+        visibility: hidden;
       }
 
       h1 {
-        font-size: 2.5rem;
+        font-size: 2.2rem;
+      }
+
+      #animated-welcome {
+        display: inline-block;
+        overflow: hidden;
+        white-space: nowrap;
+        border-right: 3px solid;
+        animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+        width: 0;
+        background-color: #ffcc00;
+        padding: 0 10px;
+      }
+
+      @keyframes typing {
+        0% {
+          width: 0;
+        }
+        100% {
+          width: 100%;
+        }
+      }
+
+      @keyframes blink-caret {
+        from,
+        to {
+          border-color: transparent;
+        }
+        50% {
+          border-color: black;
+        }
+      }
+
+      #animated-welcome {
+        animation: typing 3.5s steps(40, end) infinite, blink-caret 0.75s step-end infinite;
       }
 
       h2 {
-        font-size: 2rem;
+        font-size: 1.8rem;
       }
 
       ul {
@@ -52,17 +100,17 @@
         padding: 1rem;
         margin-bottom: 1rem;
         box-shadow: 8px 8px 0 #000;
-        font-size: 1.2rem;
+        font-size: 1.1rem;
       }
 
-      strong {
-        font-weight: 700;
+      .content {
+        font-size: 0.8rem;
       }
 
       .stylee {
         display: inline-block;
         margin: 0 10px;
-        padding: 10px 20px;
+        padding: 8px 18px;
         border: 3px solid #000;
         background-color: #4a90e2;
         color: #fff;
@@ -70,17 +118,19 @@
         font-weight: 700;
         box-shadow: 5px 5px 0 #000;
         transition: background-color 0.3s ease;
+        font-size: 1rem;
       }
 
       .stylee:hover {
         background-color: #000;
       }
+
       a {
         text-decoration: none;
         color: #000;
         font-weight: bold;
       }
-      /* Elemen dekoratif geometris */
+
       .decorative-shape {
         position: absolute;
         background-color: #ff6666;
@@ -102,18 +152,26 @@
         top: 20px;
         right: 20px;
       }
+
       .copyright {
-        font-size: 0.8rem;
+        font-size: 0.9rem;
         color: #000;
         margin-top: 2rem;
         text-align: center;
         background-color: #ffcc00;
         padding: 5px;
       }
+
       p {
         background-color: #ffcc00;
         text-align: center;
         padding: 20px;
+      }
+
+      .created-at {
+        float: right;
+        font-size: 0.75rem;
+        color: #666;
       }
     </style>
   </head>
@@ -121,7 +179,8 @@
     <div class="decorative-shape circle"></div>
     <div class="decorative-shape square"></div>
 
-    <h1>Welcome, {{ session['username'] }}</h1>
+    <h1 id="animated-welcome">Welcome, {{ session['username'] }}</h1>
+
     <p>"Got something to say? Write it down and keep your notes organized in one place!"</p>
 
     <div>
@@ -133,7 +192,11 @@
 
     <ul>
       {% for note in notes %}
-      <li><strong>{{ note['title'] }}</strong> : {{ note['content'] }}</li>
+      <li>
+        <strong>{{ note['title'] }}</strong> :
+        <span class="content">{{ note['content'] }}</span>
+        <span class="created-at">{{ note['created_at'] }}</span>
+      </li>
       {% else %}
       <li>Notes not found.</li>
       {% endfor %}
