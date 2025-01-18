@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
 import os
 from datetime import datetime
+from bson import ObjectId
 
 
 app = Flask(__name__)
@@ -94,6 +95,14 @@ def add_note():
         return redirect(url_for('home'))
 
     return render_template('add_note.html')
+@app.route('/delete_note/<note_id>', methods=['POST'])
+def delete_note(note_id):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    # Menghapus catatan berdasarkan ID
+    mongo.db.notes.delete_one({"_id": ObjectId(note_id)})
+    return redirect(url_for('home'))
 
 if __name__ == '__main__':
     app.run(debug=True)
