@@ -40,7 +40,7 @@
         white-space: nowrap;
         animation: typing 3.5s steps(40, end) infinite, blink-caret 0.75s step-end infinite;
         background-color: #ffcc00;
-        padding: 0 10px;
+        padding: 0;
         border-right: 0;
       }
 
@@ -90,7 +90,7 @@
       }
 
       .content {
-        font-size: 0.8rem;
+        font-size: 1rem;
       }
 
       .stylee {
@@ -156,9 +156,8 @@
 
       .created-at {
         float: right;
-        font-size: 0.75rem;
+        font-size: 0.8rem;
         color: #666;
-        padding: 5px;
       }
       .delete-btn:hover {
         cursor: pointer;
@@ -185,10 +184,12 @@
       <li>
         <strong>{{ note['title'] }}</strong> :
         <span class="content">{{ note['content'] }}</span>
-        <span class="created-at">{{ note['created_at'] }}</span>
         <form action="{{ url_for('delete_note', note_id=note['_id']) }}" method="POST" style="display: inline" onsubmit="return confirmDelete()">
           <button type="submit" class="delete-btn"><i class="bi bi-trash"></i></button>
         </form>
+        <a href="{{ url_for('edit_note', note_id=note['_id']) }}" class="edit-btn"> <i class="bi bi-pencil"></i> Edit </a>
+        <br />
+        <span class="created-at">{{ note['created_at'] }}</span>
       </li>
       {% else %}
       <li>Notes not found.</li>
@@ -196,7 +197,7 @@
     </ul>
 
     <!-- Copyright -->
-    <div class="copyright">&copy; 2025 Created with ❤️ by <a href="https://www.instagram.com/sjordanp_/">septianjordanpurba</a></div>
+    <div class="copyright" style="position: fixed; bottom: 0px; margin-right: auto; margin-left: auto">&copy; 2025 Created with ❤️ by <a href="https://www.instagram.com/sjordanp_/">septianjordanpurba</a></div>
 
     <script>
       function confirmDelete() {

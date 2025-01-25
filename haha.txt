@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 import os
 from datetime import datetime
 from bson import ObjectId
+from datetime import datetime
+import pytz
 
 
 app = Flask(__name__)
@@ -17,6 +19,9 @@ app.secret_key = 'supersecretkey'  # Ganti dengan key yang lebih aman
 
 mongo = PyMongo(app)
 bcrypt = Bcrypt(app)  # Inisialisasi Flask-Bcrypt
+
+# Mendapatkan zona waktu Jakarta
+jakarta_tz = pytz.timezone('Asia/Jakarta')
 
 # Halaman utama - menampilkan catatan pengguna
 @app.route('/')
@@ -80,7 +85,8 @@ def add_note():
     if 'username' not in session:
         return redirect(url_for('login'))
 
-    current_time = datetime.now().strftime("%Y-%m-%d ")
+    # Mendapatkan waktu saat ini dengan zona waktu Jakarta
+current_time = datetime.now(jakarta_tz).strftime("%Y-%m-%d %H:%M:%S")
 
 
     if request.method == 'POST':
@@ -103,35 +109,6 @@ def delete_note(note_id):
     # Menghapus catatan berdasarkan ID
     mongo.db.notes.delete_one({"_id": ObjectId(note_id)})
     return redirect(url_for('home'))
-@app.route('/edit_note/<note_id>', methods=['GET', 'POST'])
-def edit_note(note_id):
-    if 'username' not in session:
-        return redirect(url_for('login'))
-    
-    # Ambil catatan dari database berdasarkan note_id
-    note = mongo.db.notes.find_one({"_id": ObjectId(note_id)})
-    
-    if request.method == 'POST':
-        title = request.form['title']
-        content = request.form['content']
-        
-        # Mendapatkan waktu saat ini
-        current_time = datetime.now().strftime("%Y-%m-%d")
-        
-        # Perbarui catatan
-        mongo.db.notes.update_one(
-            {"_id": ObjectId(note_id)},
-            {"$set": {
-                "title": title, 
-                "content": content, 
-                "updated_at": current_time  # Perbarui updated_at dengan waktu saat ini
-            }}
-        )
-        
-        return redirect(url_for('home'))
-    
-    return render_template('edit_note.html', note=note)
-
 
 if __name__ == '__main__':
     app.run(debug=True)
